@@ -1,0 +1,5 @@
+ACCESS_TOKEN_COOKIE_NAME = "Access-Token"
+REFRESH_TOKEN_COOKIE_NAME = "Refresh-Token"
+CSRF_ACCESS_TOKEN_KEY = "access_token"
+CSRF_REFRESH_TOKEN_KEY = "refresh_token"
+
