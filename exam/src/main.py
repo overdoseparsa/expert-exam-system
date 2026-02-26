@@ -9,6 +9,10 @@ from auth.models import Base
 from config import settings
 from database import engine
 
+from fastapi import FastAPI
+from app import routers
+
+app = FastAPI()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,6 +37,8 @@ app.add_middleware(
 
 app.include_router(router, prefix="/api/v1")
 
+for router in routers:
+    app.include_router(router,prefix="/api/v1")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8009, log_level="info", reload=True)

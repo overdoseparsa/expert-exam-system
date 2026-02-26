@@ -5,7 +5,7 @@ from typing import List, Optional, Dict
 from datetime import datetime
 
 from .models import JobApplication
-from jobs_information.models import JobDB
+from app.jobs_information.models import JobDB
 
 
 class JobApplicationSelector:

@@ -7,7 +7,7 @@ from datetime import datetime, date
 from database import get_db
 from auth.depends import get_current_user
 from auth.models import User
-from application_details.models import ApplicationDetails 
+from .models import ApplicationDetails 
 
 from .schemas import (
     ApplicationDetailsCreate,

@@ -4,7 +4,7 @@ from typing import List, Optional
 
 
 from .models import JobDB
-from admin.models import AdminJobAssignment
+from app.admin.models import AdminJobAssignment
 from auth.models import User
 
 

@@ -7,9 +7,9 @@ from datetime import datetime
 from database import get_db
 from auth.depends import get_current_user
 from auth.models import User
-from jobs_information.models import JobDB 
-from job_applications.models  import JobApplication
-from applicant.models import Applicant
+from app.jobs_information.models import JobDB 
+from .models  import JobApplication
+from app.applicant.models import Applicant
 
 from .schemas import (
     JobApplicationBatch,

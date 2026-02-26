@@ -6,7 +6,7 @@ from datetime import date
 
 from .models import MilitaryService
 from auth.models import User
-from applicant.models import Applicant
+from app.applicant.models import Applicant
 
 class MilitarySelector:
     @staticmethod

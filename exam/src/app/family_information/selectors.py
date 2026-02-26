@@ -3,7 +3,7 @@ from sqlalchemy import select, and_, or_, func
 from typing import List, Optional, Tuple
 from datetime import datetime
 
-from .models import Spouse, Child, Sibling, Applicant
+from .models import Spouse, Child, Sibling
 from .schemas import ChildGenderEnum, SiblingTypeEnum, SiblingMaritalStatusEnum
 
 
@@ -15,14 +15,14 @@ class SpouseSelector:
         result = await db.execute(query)
         return result.scalar_one_or_none()
     
-    @staticmethod
-    async def get_with_applicant(db: AsyncSession, user_id: int) -> Optional[Tuple[Spouse, Applicant]]:
+    # @staticmethod # TODO 
+    # async def get_with_applicant(db: AsyncSession, user_id: int) -> Optional[Tuple[Spouse, Applicant]]:
         
-        query = select(Spouse, Applicant).join(
-            Applicant, Applicant.user_id == Spouse.user_id
-        ).where(Spouse.user_id == user_id)
-        result = await db.execute(query)
-        return result.first()
+    #     query = select(Spouse, Applicant).join(
+    #         Applicant, Applicant.user_id == Spouse.user_id
+    #     ).where(Spouse.user_id == user_id)
+    #     result = await db.execute(query)
+    #     return result.first()
     
     @staticmethod
     async def count_all(db: AsyncSession) -> int:

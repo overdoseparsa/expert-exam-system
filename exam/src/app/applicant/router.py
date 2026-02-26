@@ -82,7 +82,7 @@ async def get_applicants_api(
     return applicants
 
 
-@router.get("/me", response_model=ApplicantResponse)
+@router.get("/me/", response_model=ApplicantResponse)
 async def get_my_applicant(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -99,7 +99,7 @@ async def get_my_applicant(
     return applicant
 
 
-@router.get("/{applicant_id}", response_model=ApplicantResponse)
+@router.get("/{applicant_id}/", response_model=ApplicantResponse)
 async def get_applicant_by_id_api(
     applicant_id: int,
     db: AsyncSession = Depends(get_db),
@@ -123,7 +123,7 @@ async def get_applicant_by_id_api(
     return applicant
 
 
-@router.get("/tracking/{tracking_code}", response_model=ApplicantResponse)
+@router.get("/tracking/{tracking_code}/", response_model=ApplicantResponse)
 async def get_applicant_by_tracking_api(
     tracking_code: str,
     db: AsyncSession = Depends(get_db)
@@ -141,7 +141,7 @@ async def get_applicant_by_tracking_api(
     return applicant
 
 
-@router.put("/{applicant_id}", response_model=ApplicantResponse)
+@router.put("/{applicant_id}/", response_model=ApplicantResponse)
 async def update_applicant_api(
     applicant_id: int,
     applicant_data: ApplicantUpdate,
@@ -182,7 +182,7 @@ async def update_applicant_api(
 
 
 
-@router.delete("/{applicant_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{applicant_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_applicant_api(
     applicant_id: int,
     current_user: User = Depends(get_current_user),

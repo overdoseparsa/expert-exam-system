@@ -12,7 +12,7 @@ from .jwt_handler import jwt_handler
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from .models import User
-from .selectors import get_user_by_id
+from .selectors import get_user_by_id , get_user_admin
 
 
 http_bearer = HTTPBearer()
@@ -74,3 +74,17 @@ async def get_current_user_obj(
     if not user:
         raise ForbiddenException("User not found")
     return user
+
+async def get_current_user_obj_admin(
+    db: AsyncSession = Depends(get_db),
+    user_id :User = Depends(get_current_user)
+)->User:
+    user = await get_user_admin(
+        db ,
+        user_id
+    )
+    if not user : 
+        raise ForbiddenException("Invalid user for admin access")
+    
+    else : 
+        return user

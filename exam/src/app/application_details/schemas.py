@@ -5,7 +5,7 @@ from enum import Enum
 from decimal import Decimal
 
 
-from enums import ConnectionTypeEnum , WorkScheduleEnum
+from .enums import ConnectionTypeEnum , WorkScheduleEnum
 
 
 class ApplicationDetailsBase(BaseModel):

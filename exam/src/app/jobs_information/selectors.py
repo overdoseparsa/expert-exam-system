@@ -5,7 +5,7 @@ from typing import List, Optional, Dict
 from datetime import date
 
 from .models import JobDB
-from admin.models import AdminJobAssignment
+from app.admin.models import AdminJobAssignment
 from auth.models import User
 
 

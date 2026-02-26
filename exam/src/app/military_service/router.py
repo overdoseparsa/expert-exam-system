@@ -15,7 +15,7 @@ from .schemas import (
 from .services import MilitaryService as MilitaryServiceService
 from .selectors import MilitarySelector
 
-router = APIRouter(prefix="/military/", tags=["Military Service"])
+router = APIRouter(prefix="/military", tags=["Military Service"])
 
 
 @router.get("/", response_model=Optional[MilitaryServiceResponse])

@@ -9,7 +9,7 @@ from .schemas import (
     SingleJobApplication
 )
 
-from jobs_information.models import JobDB
+from app.jobs_information.models import JobDB
 import datetime
 
 class JobApplicationService:

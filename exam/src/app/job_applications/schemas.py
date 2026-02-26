@@ -2,7 +2,7 @@
 from pydantic import BaseModel, Field, validator
 from datetime import datetime
 from typing import Optional, List, Dict
-from enums import JobApplicationStatus
+from .enums import JobApplicationStatus
 
 
 

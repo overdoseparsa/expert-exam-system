@@ -1,7 +1,8 @@
 from typing import Optional, List
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_ , and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from .models import User
+from .enums import RoleEnum
 
 
 async def get_user_by_id(db: AsyncSession, user_id: int) -> Optional[User]:
@@ -49,3 +50,18 @@ async def list_users(
     )
     return list(result.scalars().all())
 
+
+async def get_user_admin(
+    db: AsyncSession,
+    user_id: int
+) -> Optional[User]:
+
+    query = select(User).where(
+        and_(
+            User.id == user_id,
+            User.role == RoleEnum.MANAGER
+        )
+    )
+
+    result = await db.execute(query)
+    return result.scalar_one_or_none()

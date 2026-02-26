@@ -13,7 +13,7 @@ from .schemas import (
 from .services import LanguageService
 from .selectors import LanguageSelector
 
-router = APIRouter(prefix="/languages/", tags=["Language Skills"])
+router = APIRouter(prefix="/languages", tags=["Language Skills"])
 
 
 # ========== LANGUAGE SKILLS ==========

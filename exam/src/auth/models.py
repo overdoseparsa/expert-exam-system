@@ -6,12 +6,14 @@ from sqlalchemy import (
     String,
     Boolean,
     DateTime,
+    Enum,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from database import Base
 from datetime import datetime
+from .enums import RoleEnum
 
 class AbstractModel(Base):
     """
@@ -39,7 +41,7 @@ class User(AbstractModel):
     mobile = Column(String(11), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=True)
     password_hash = Column(String(255), nullable=False)
-    role = Column(String(125), nullable=True)
+    role = Column(Enum(RoleEnum),default= RoleEnum.USER , nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
     is_verified_phone = Column(

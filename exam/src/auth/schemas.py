@@ -1,11 +1,12 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr, constr
 from datetime import datetime
+from .enums import RoleEnum
 
 class UserBase(BaseModel):
     mobile: constr(min_length=11, max_length=11)
     email: Optional[EmailStr] = None
-    role: Optional[str] = None
+    role: Optional[RoleEnum] = RoleEnum.USER
     is_active: bool = True
     is_verified: bool = False
     is_verified_phone: bool = False

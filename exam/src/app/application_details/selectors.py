@@ -4,8 +4,8 @@ from typing import Optional, Dict
 from datetime import datetime, date
 
 from .models import ApplicationDetails
-from applicant.models import Applicant
-from enums import ConnectionTypeEnum , WorkScheduleEnum
+from app.applicant.models import Applicant
+from .enums import ConnectionTypeEnum , WorkScheduleEnum
 
 
 class ApplicationDetailsSelector:

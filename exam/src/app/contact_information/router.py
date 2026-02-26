@@ -24,7 +24,7 @@ from .schemas import (
 from auth.models import User
 
 
-router = APIRouter(prefix="/contact/", tags=["Contact"])
+router = APIRouter(prefix="/contact", tags=["Contact"])
 
 @router.post("/contact/")
 def create_user_contact(

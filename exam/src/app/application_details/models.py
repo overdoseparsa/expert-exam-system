@@ -16,7 +16,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
 from database import Base
-from enums import ConnectionTypeEnum , WorkScheduleEnum
+from .enums import ConnectionTypeEnum , WorkScheduleEnum
 
 
 

@@ -87,6 +87,6 @@ async def logout_user(response: Response):
         "message": "با موفقیت خارج شدید"
     }
 
-@router.get("/debug")
+@router.get("/debug/")
 async def debug(request: Request):
     return request.cookies

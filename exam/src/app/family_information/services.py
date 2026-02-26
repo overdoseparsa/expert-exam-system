@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
-from .models import Spouse, Child, Sibling, Applicant
+from .models import Spouse, Child, Sibling
 from .schemas import (
     SpouseCreate, SpouseUpdate,
     ChildCreate, ChildUpdate,
@@ -60,9 +60,9 @@ class SpouseService:
         await db.flush()
     
     @staticmethod
-    async def exists(db: AsyncSession, applicant: Applicant) -> bool:
+    async def exists(db: AsyncSession,user_id) -> bool:
         """بررسی وجود همسر"""
-        query = select(Spouse).where(Spouse.user_id == applicant.user_id)
+        query = select(Spouse).where(Spouse.user_id == user_id)
         result = await db.execute(query)
         return result.first() is not None
 
@@ -121,9 +121,9 @@ class ChildService:
         await db.flush()
     
     @staticmethod
-    async def count_by_applicant(db: AsyncSession, applicant: Applicant) -> int:
+    async def count_by_applicant(db: AsyncSession, user_id) -> int:
         """تعداد فرزندان"""
-        query = select(Child).where(Child.user_id == applicant.user_id)
+        query = select(Child).where(Child.user_id == user_id)
         result = await db.execute(query)
         return len(result.scalars().all())
 
@@ -184,8 +184,8 @@ class SiblingService:
         await db.flush()
     
     @staticmethod
-    async def count_by_applicant(db: AsyncSession, applicant: Applicant) -> int:
+    async def count_by_applicant(db: AsyncSession, user_id) -> int:
         """تعداد خواهر/برادرها"""
-        query = select(Sibling).where(Sibling.user_id == applicant.user_id)
+        query = select(Sibling).where(Sibling.user_id == user_id)
         result = await db.execute(query)
         return len(result.scalars().all())
