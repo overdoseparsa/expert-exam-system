@@ -142,7 +142,7 @@ def delete_application_details(
         )
 
 
-@router.get("/summary", response_model=DetailsSummaryResponse)
+@router.get("/summary/", response_model=DetailsSummaryResponse)
 def get_details_summary(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -161,7 +161,7 @@ def get_details_summary(
 
 
 # ========== ADMIN ENDPOINTS ==========
-@router.get("/admin/all")
+@router.get("/admin/all/")
 def get_all_application_details(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -177,7 +177,7 @@ def get_all_application_details(
     return details
 
 
-@router.get("/statistics")
+@router.get("/statistics/")
 def get_application_details_statistics(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)

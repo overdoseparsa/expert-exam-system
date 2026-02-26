@@ -15,7 +15,7 @@ class UserBase(BaseModel):
 class UserCreate(BaseModel):
     mobile: constr(min_length=11, max_length=11)
     email: Optional[EmailStr] = None
-    role: Optional[str] = None
+    role: Optional[RoleEnum] = RoleEnum.USER
     password: constr(min_length=8)
 
     def validate_mobile(cls, v):
