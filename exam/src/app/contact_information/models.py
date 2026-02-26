@@ -12,6 +12,7 @@ from sqlalchemy.sql import func
 
 from .enums import HousingStatusEnum
 from database import Base
+from auth.models import User
 
 
 class AbstractModel(Base):
@@ -50,7 +51,7 @@ class ContactInfo(AbstractModel):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    user = relationship("User", back_populates="contact_info")
+    user = relationship("User", backref="contact_info")
 
 
 class Address(AbstractModel):
@@ -80,4 +81,4 @@ class Address(AbstractModel):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    user = relationship("User", back_populates="addresses")
+    user = relationship("User", backref="addresses")

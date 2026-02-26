@@ -44,7 +44,7 @@ class Spouse(AbstractModel):
     full_name = Column(String(200), nullable=False)
     job = Column(String(100), nullable=True)
 
-    applicant = relationship("Applicant", back_populates="spouse")
+    user = relationship("User", backref="spouse")
 
 class Child(AbstractModel):
     __tablename__ = "children"
@@ -56,6 +56,7 @@ class Child(AbstractModel):
     
     gender = Column(Enum(GenderEnum), nullable=False)
 
+    user = relationship("User", backref="child")
 
 class Sibling(AbstractModel):
     __tablename__ = "siblings"
@@ -69,5 +70,5 @@ class Sibling(AbstractModel):
     marital_status = Column(Enum(MaritalStatusEnum), nullable=False)
     job = Column(String(100), nullable=True)
    
-    applicant = relationship("Applicant", back_populates="siblings")
+    user = relationship("User", backref="siblings")
 

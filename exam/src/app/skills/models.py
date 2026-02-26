@@ -33,4 +33,6 @@ class Skill(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # relationships
-    applicant = relationship("Applicant", back_populates="skills")
+    # applicant = relationship("Applicant", back_populates="skills")
+    user = relationship("User", backref="Skill")
+    

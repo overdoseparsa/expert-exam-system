@@ -25,6 +25,7 @@ async def check_existing_user(
     mobile: str, 
     email: Optional[str] = None
 ) -> Optional[User]:
+    print('query check_existing_user')
     """بررسی وجود کاربر با موبایل یا ایمیل"""
     if email:
         query = select(User).where(
@@ -33,7 +34,9 @@ async def check_existing_user(
     else:
         query = select(User).where(User.mobile == mobile)
     
+
     result = await db.execute(query)
+    print("result  .....query ",result)
     return result.scalar_one_or_none()
 
 async def list_users(

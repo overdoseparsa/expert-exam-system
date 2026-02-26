@@ -71,13 +71,14 @@ async def register_user(
     user_data: UserCreate
 ) -> User:
     
-    # بررسی وجود کاربر
+    print("checking user")
+
     existing_user = await user_selector.check_existing_user(
         db, 
         mobile=user_data.mobile,
         email=user_data.email
     )
-    
+
     if existing_user:
         if existing_user.mobile == user_data.mobile:
             raise HTTPException(

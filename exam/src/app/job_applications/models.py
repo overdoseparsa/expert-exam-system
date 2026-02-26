@@ -34,9 +34,8 @@ class JobApplication(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # روابط
-    applicant = relationship("Applicant", back_populates="job_applications")
-    job = relationship("JobDB")
-    user = relationship("User")
+    # job = relationship("JobDB" , backref='job_application')
+    user = relationship("User",backref="job_application")
     
     __table_args__ = (
         UniqueConstraint('user_id', 'job_id', name='unique_user_job'),

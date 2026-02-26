@@ -51,4 +51,4 @@ class JobDB(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # relationships
-    admin_assignments = relationship("AdminJobAssignment", back_populates="job")
+    admin_assignments = relationship("AdminJobAssignment", backref="JobDB")

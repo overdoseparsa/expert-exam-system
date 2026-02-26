@@ -18,6 +18,7 @@ from sqlalchemy.orm import relationship
 from database import Base
 from .enums import ConnectionTypeEnum , WorkScheduleEnum
 
+from auth.models import User
 
 
 class ApplicationDetails(Base):
@@ -66,6 +67,6 @@ class ApplicationDetails(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    applicant = relationship("Applicant", back_populates="application_details")
+    user = relationship("User", backref="application_details")
 
 

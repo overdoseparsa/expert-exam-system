@@ -27,6 +27,7 @@ async def register_user_endpoint(
     user_data: UserCreate,
     db: AsyncSession = Depends(get_db)
 ):
+ 
     return await register_user_service(
         db , 
         user_data

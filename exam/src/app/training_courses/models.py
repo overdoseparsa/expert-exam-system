@@ -39,4 +39,6 @@ class TrainingCourse(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    applicant = relationship("Applicant", back_populates="training_courses")
+    # applicant = relationship("Applicant", back_populates="training_courses")
+    
+    user = relationship("User", backref="TrainingCourse")

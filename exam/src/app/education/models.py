@@ -35,4 +35,4 @@ class Education(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # relationships
-    applicant = relationship("Applicant", back_populates="educations")
+    user = relationship("User", backref="educations")
