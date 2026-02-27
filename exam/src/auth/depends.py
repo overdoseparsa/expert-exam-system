@@ -15,17 +15,19 @@ from .models import User
 from .selectors import get_user_by_id , get_user_admin
 
 
-http_bearer = HTTPBearer()
+http_bearer = HTTPBearer(auto_error=True)
 
 
 async def get_current_user(
     request: Request,
-    credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
-) -> str:
-    if credentials.scheme != "Bearer":
-        raise ForbiddenException("Invalid header")
+    # credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 
+) -> str:
+    # if credentials.scheme != "Bearer":
+    #     raise ForbiddenException("Invalid header")
     access_token = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME)
+    print('access_token' , access_token)
+
     if not access_token:
         raise ForbiddenException("Access token is not provided")
 
@@ -35,9 +37,9 @@ async def get_current_user(
     if not user_id or token_type != "access":
         raise ForbiddenException("Invalid access token")
 
-    csrf_token = jwt_handler.decode(credentials.credentials)
-    if csrf_token.get(CSRF_ACCESS_TOKEN_KEY) != access_token:
-        raise ForbiddenException("Invalid CSRF token")
+    # csrf_token = jwt_handler.decode(credentials.credentials)
+    # if csrf_token.get(CSRF_ACCESS_TOKEN_KEY) != access_token:
+    #     raise ForbiddenException("Invalid CSRF token")
 
     return str(user_id)
 
@@ -83,6 +85,7 @@ async def get_current_user_obj_admin(
         db ,
         user_id
     )
+    print("user" , user)
     if not user : 
         raise ForbiddenException("Invalid user for admin access")
     

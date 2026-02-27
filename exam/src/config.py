@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     # Auth cookie settings
     AUTH_TOKEN_NAME: str = "Access-Token"
     HTTP_ONLY: bool = True
-    HTTP_SECURE: bool = False  # set True in production with HTTPS
-    SAME_SITE: str = "lax"
+    HTTP_SECURE: bool = True  # set True in production with HTTPS
+    SAME_SITE: str = "none"
     ALLOWED_ORIGINS_LIST :list[str] = ['https://localhost:3000']
     class Config:
         env_file = ".env"

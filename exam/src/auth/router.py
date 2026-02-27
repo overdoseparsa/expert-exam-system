@@ -70,6 +70,7 @@ async def update_password(
     current_user: User = Depends(get_current_user_obj),
     db: AsyncSession = Depends(get_db),
 ):
+    print('user is ', current_user)
     await update_user_password_service(db, current_user, password_data)
     return {"message": "رمز عبور با موفقیت تغییر کرد"}
 
