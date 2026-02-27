@@ -62,7 +62,7 @@ async def get_user_admin(
     query = select(User).where(
         and_(
             User.id == user_id,
-            User.role == RoleEnum.MANAGER
+            User.role == RoleEnum.MANGER
         )
     )
 
