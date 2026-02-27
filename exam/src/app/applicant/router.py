@@ -179,6 +179,54 @@ async def update_applicant_api(
         )
 
 
+@router.put("/my-applicant/", response_model=ApplicantResponse)
+async def update_applicant_api(
+    applicant_data: ApplicantUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+
+    try:
+        from .selectors import get_applicant_by_id
+        
+        applicant = await  get_applicant_by_id(
+            current_user.id
+        )
+        if not applicant :
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='اطلاعات اولیه ثبت نشده اند'
+            )
+        updated_applicant = await update_applicant(
+            db, applicant.id, applicant_data, current_user.id
+        )
+        
+        if not updated_applicant:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="متقاضی یافت نشد"
+            )
+        
+        return updated_applicant
+        
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(e)
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"خطا در به‌روزرسانی: {str(e)}"
+        )
+
+
+
 
 
 
@@ -215,3 +263,60 @@ async def delete_applicant_api(
         )
 
 
+@router.patch("/my-applicant/", response_model=ApplicantResponse)
+async def patch_my_applicant_api(
+    applicant_data: ApplicantUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        from .selectors import get_applicant_by_user_id
+
+        # گرفتن applicant مربوط به یوزر
+        applicant = await get_applicant_by_user_id(db, current_user.id)
+
+        if not applicant:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="اطلاعات اولیه ثبت نشده‌اند"
+            )
+
+        # فقط فیلدهایی که ارسال شدن
+        update_data = applicant_data.dict(exclude_unset=True)
+
+        # اگه چیزی برای آپدیت نبود
+        if not update_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="هیچ فیلدی برای به‌روزرسانی ارسال نشده"
+            )
+
+        # چک یکتا بودن national_code (اگه تغییر کرد)
+        if "national_code" in update_data:
+            from .selectors import get_applicant_by_national_code
+
+            existing = await get_applicant_by_national_code(
+                db, update_data["national_code"]
+            )
+            if existing and existing.id != applicant.id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="کد ملی قبلاً ثبت شده"
+                )
+
+        # اعمال تغییرات
+        for field, value in update_data.items():
+            setattr(applicant, field, value)
+
+        await db.commit()
+        await db.refresh(applicant)
+
+        return applicant
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"خطا در به‌روزرسانی: {str(e)}"
+        )

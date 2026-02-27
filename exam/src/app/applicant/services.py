@@ -65,7 +65,7 @@ async def create_applicant(
     await db.refresh(applicant)
     return applicant
 
-
+from fastapi import Depends
 async def update_applicant(
     db: AsyncSession,
     applicant_id: int,
@@ -304,3 +304,8 @@ async def get_applicant_statistics(db: AsyncSession) -> Dict[str, int]:
         "rejected": rejected,
         "today_submissions": today_submissions
     }
+
+# async def update_applicant_user_by_self(
+#     user_id : int , 
+    
+# ): 

@@ -9,7 +9,6 @@ from datetime import (date , datetime)
 
 class ApplicantBase(BaseModel):
     """Base schema for Applicant with common fields"""
-    id : Optional[int] 
     name: Optional[str] = Field(None, min_length=3, max_length=200)
     family: Optional[str] = Field(None, min_length=3, max_length=200)
     national_code: str = Field(..., min_length=10, max_length=10, description="کد ملی 10 رقمی")
@@ -26,7 +25,6 @@ class ApplicantBase(BaseModel):
     blood_type: Optional[BloodTypeEnum] = Field(None, description="گروه خونی")
     marital_status: MaritalStatusEnum = Field(MaritalStatusEnum.SINGLE, description="وضعیت تأهل")
     marriage_date: Optional[date] = Field(None, description="تاریخ ازدواج")
-    user_id: Optional[int] 
   
 
 
@@ -53,7 +51,8 @@ class ApplicantResponse(ApplicantBase):
     marriage_date: Optional[date] = None
     tracking_code: Optional[str] = None
     submitted_at: Optional[datetime] = None
-    
+    user_id: Optional[int] 
+
     # اطلاعات کاربر (اختیاری - اگه نیاز داری)
     # user: Optional['UserResponse'] = None
     
@@ -63,7 +62,8 @@ class ApplicantResponse(ApplicantBase):
     def full_name(self) -> str:
         """Return full name (name + family)"""
         return f"{self.name} {self.family}"
-class ApplicantUpdate(BaseModel):
+    
+class ApplicantUpdate(BaseModel): # TODO duplicate fields 
     """Schema for updating an applicant (partial update)"""
     name: Optional[str] = Field(None, min_length=3, max_length=200)
     family: Optional[str] = Field(None, min_length=3, max_length=200)

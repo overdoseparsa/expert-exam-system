@@ -267,3 +267,17 @@ async def get_today_submissions_count(db: AsyncSession) -> int:
         )
     )
     return len(result.scalars().all())
+
+
+"""
+in This layer it sperate , to use Depends from Fastapi it
+"""
+# def inject(func):
+#     async def wrapper(*args, **kwargs):
+#         db = kwargs.get("db")
+#         user_id = kwargs.get("user_id")
+
+#         applicant = await get_applicant_by_user_id(db, user_id)
+#         return await func(applicant=applicant, *args, **kwargs)
+
+#     return wrapper
