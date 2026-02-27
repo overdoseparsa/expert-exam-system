@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from database import get_db
-from auth.depends import get_current_user
+from auth.depends import get_current_user_obj as get_current_user
 from auth.models import User
 from .schemas import (
     EducationCreate,
@@ -133,13 +133,13 @@ async def delete_education(
         )
 
 
-@router.get("/highest-degree/", response_model=Optional[EducationResponse])
+@router.get("/highest-degree/",)
 async def get_highest_degree(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     highest = await EducationSelector.get_highest_degree(db, current_user.id)
-    return highest
+    return {'status':'in_develop'}
 
 
 @router.post("/bulk/", response_model=List[EducationResponse], status_code=status.HTTP_201_CREATED)

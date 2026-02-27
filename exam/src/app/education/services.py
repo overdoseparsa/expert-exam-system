@@ -29,6 +29,7 @@ class EducationService:
     
     @staticmethod
     async def create(db: AsyncSession, user_id: int, data: EducationCreate) -> Education:
+        # we dont use EducationService.create for each for call db.flash
         education = Education(
             user_id=user_id,
             degree=data.degree,
@@ -39,7 +40,7 @@ class EducationService:
             end_year=data.end_year,
             study_status=data.study_status,
             description=data.description
-        )
+        ) 
         db.add(education)
         await db.flush()
         return education
@@ -48,7 +49,7 @@ class EducationService:
     async def create_bulk(db: AsyncSession, user_id: int, data: EducationBulkCreate) -> List[Education]:
         """ایجاد چند مدرک تحصیلی به صورت یکجا"""
         new_educations = []
-        
+        # TODO fix this dont use depubcate 
         for edu in data.educations:
             education = Education(
                 user_id=user_id,
