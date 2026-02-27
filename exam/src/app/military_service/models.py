@@ -20,7 +20,7 @@ class MilitaryService(Base):
     __tablename__ = "military_services"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     
     service_start = Column(Date, nullable=True)
     service_end = Column(Date, nullable=True)

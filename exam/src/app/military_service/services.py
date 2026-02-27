@@ -4,27 +4,45 @@ from sqlalchemy import select, and_
 from typing import Optional
 from datetime import datetime
 
-from .models import MilitaryService
+from .models import MilitaryService as MilitaryServiceModel
 from .schemas import MilitaryServiceCreate, MilitaryServiceUpdate
 
 
 class MilitaryService:
 
     @staticmethod
-    async def get_by_user(db: AsyncSession, user_id: int) -> Optional[MilitaryService]:
+    async def get_by_user(
+        db: AsyncSession,
+        user_id: int
+        ) -> Optional[MilitaryServiceModel]:
         
-        query = select(MilitaryService).where(MilitaryService.user_id == user_id)
+        query = select(MilitaryServiceModel).where(MilitaryServiceModel.user_id == user_id)
+        result = await db.execute(query)
+        return result.scalars().all()
+    
+    @staticmethod
+    async def get_by_user_id(
+        db: AsyncSession,
+        user_id: int,
+        militray_id : int 
+        ) -> Optional[MilitaryServiceModel]:
+        
+        query = select(MilitaryServiceModel).where(
+            MilitaryServiceModel.user_id == user_id,
+            MilitaryServiceModel.id == militray_id
+            )
         result = await db.execute(query)
         return result.scalar_one_or_none()
     
+
     @staticmethod
     async def create(
         db: AsyncSession, 
         user_id: int, 
         data: MilitaryServiceCreate
-    ) -> MilitaryService:
+    ) -> MilitaryServiceModel:
 
-        military = MilitaryService(
+        military = MilitaryServiceModel(
             user_id=user_id,
             service_start=data.service_start,
             service_end=data.service_end,
@@ -43,9 +61,9 @@ class MilitaryService:
     @staticmethod
     async def update(
         db: AsyncSession,
-        military: MilitaryService,
+        military: MilitaryServiceModel,
         data: MilitaryServiceUpdate
-    ) -> MilitaryService:
+    ) -> MilitaryServiceModel:
 
         update_data = data.dict(exclude_unset=True)
         for field, value in update_data.items():
@@ -60,7 +78,7 @@ class MilitaryService:
     @staticmethod
     async def delete(
         db: AsyncSession,
-        military: MilitaryService
+        military: MilitaryServiceModel
     ) -> None:
 
         await db.delete(military)
@@ -69,6 +87,6 @@ class MilitaryService:
     @staticmethod
     async def exists(db: AsyncSession, user_id: int) -> bool:
         """بررسی وجود اطلاعات نظام وظیفه"""
-        query = select(MilitaryService).where(MilitaryService.user_id == user_id)
+        query = select(MilitaryServiceModel).where(MilitaryServiceModel.user_id == user_id)
         result = await db.execute(query)
         return result.first() is not None

@@ -5,7 +5,7 @@ from typing import List, Dict
 from datetime import datetime
 
 from database import get_db
-from auth.depends import get_current_user
+from auth.depends import get_current_user_obj as get_current_user
 from auth.models import User
 from app.jobs_information.models import JobDB 
 from .models  import JobApplication
@@ -31,17 +31,17 @@ router = APIRouter(prefix="/job-applications", tags=["Job Applications"])
 
 # ========== JOB APPLICATIONS ==========
 @router.get("/", response_model=List[JobApplicationResponse])
-def get_my_job_applications(
+async def get_my_job_applications(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """دریافت لیست درخواست‌های شغل کاربر"""
-    applications = JobApplicationService.get_by_user(db, current_user.id)
+    applications = await JobApplicationService.get_by_user(db, current_user.id)
     
     # اضافه کردن اطلاعات شغل به پاسخ
     result = []
     for app in applications:
-        job = db.query(JobDB).filter(JobDB.id == app.job_id).first()
+        job = await  db.query(JobDB).filter(JobDB.id == app.job_id).first()
         app_data = JobApplicationResponse.from_orm(app)
         if job:
             app_data.job_title = job.title

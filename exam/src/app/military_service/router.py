@@ -5,7 +5,7 @@ from typing import Optional
 from datetime import datetime
 
 from database import get_db
-from auth.depends import get_current_user
+from auth.depends import get_current_user_obj as get_current_user
 from auth.models import User
 from .schemas import (
     MilitaryServiceCreate, 
@@ -15,10 +15,12 @@ from .schemas import (
 from .services import MilitaryService as MilitaryServiceService
 from .selectors import MilitarySelector
 
+from typing import List
+
 router = APIRouter(prefix="/military", tags=["Military Service"])
 
 
-@router.get("/", response_model=Optional[MilitaryServiceResponse])
+@router.get("/", response_model=List[MilitaryServiceResponse])
 async def get_military_service(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -34,14 +36,8 @@ async def create_military_service(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """ایجاد اطلاعات نظام وظیفه"""
-    # بررسی آیا قبلاً اطلاعات نظام وظیفه دارد
-    exists = await MilitaryServiceService.exists(db, current_user.id)
-    if exists:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="شما قبلاً اطلاعات نظام وظیفه را ثبت کرده‌اید"
-        )
+
+
     
     try:
         new_military = await MilitaryServiceService.create(db, current_user.id, military_data)
@@ -62,14 +58,19 @@ async def create_military_service(
         )
 
 
-@router.put("/", response_model=MilitaryServiceResponse)
+@router.put("/{military_service}/", response_model=MilitaryServiceResponse)
 async def update_military_service(
+    military_service : int , 
     military_data: MilitaryServiceUpdate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """به‌روزرسانی اطلاعات نظام وظیفه"""
-    military = await MilitaryServiceService.get_by_user(db, current_user.id)
+    military = await MilitaryServiceService.get_by_user_id(
+        db,
+        current_user.id,
+        military_service,
+        )
     if not military:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
