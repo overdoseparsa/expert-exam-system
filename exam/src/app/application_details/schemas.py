@@ -10,6 +10,7 @@ from .enums import ConnectionTypeEnum , WorkScheduleEnum
 
 class ApplicationDetailsBase(BaseModel):
     # ۱. نحوه آشنایی
+    
     connection_type: ConnectionTypeEnum
     
     # ۲. مشخصات معرف
@@ -109,6 +110,7 @@ class ApplicationDetailsCreate(ApplicationDetailsBase):
 
 
 class ApplicationDetailsUpdate(BaseModel):
+
     connection_type: Optional[ConnectionTypeEnum] = None
     referrer_name: Optional[str] = None
     referrer_relationship: Optional[str] = None

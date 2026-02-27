@@ -1,11 +1,11 @@
 # router.py for application_details
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from datetime import datetime, date
 
 from database import get_db
-from auth.depends import get_current_user
+from auth.depends import get_current_user_obj as get_current_user
 from auth.models import User
 from .models import ApplicationDetails 
 
@@ -18,6 +18,7 @@ from .schemas import (
 from .services import ApplicationDetailsService
 from .selectors import ApplicationDetailsSelector
 
+from typing import List
 
 router = APIRouter(prefix="/application-details", tags=["Application Details"])
 
@@ -25,60 +26,54 @@ router = APIRouter(prefix="/application-details", tags=["Application Details"])
 
 
 
-# ========== APPLICATION DETAILS ==========
-@router.get("/", response_model=Optional[ApplicationDetailsResponse])
-def get_application_details(
+@router.get("/", response_model=List[ApplicationDetailsResponse])
+async def get_application_details(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
+    print("user is " , current_user)
     """دریافت جزئیات درخواست"""
-    details = ApplicationDetailsService.get_by_user(db, current_user.id)
+    details = await ApplicationDetailsService.get_by_user(db, current_user.id)
+    print('')
     return details
 
 
 @router.post("/", response_model=ApplicationDetailsResponse, status_code=status.HTTP_201_CREATED)
-def create_application_details(
+async def create_application_details(
     details_data: ApplicationDetailsCreate,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
-    """ایجاد جزئیات درخواست"""
-    # بررسی آیا قبلاً ApplicationDetails دارد
-    exists = ApplicationDetailsService.exists(db, current_user.id)
-    if exists:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="شما قبلاً جزئیات درخواست را ثبت کرده‌اید"
-        )
-    
+
+
     try:
-        new_details = ApplicationDetailsService.create(db, current_user.id, details_data)
-        
+        new_details = await  ApplicationDetailsService.create(db, current_user.id, details_data)
+    
 
-        
-
-        
-        db.commit()
-        db.refresh(new_details)
         
         return new_details
         
     except Exception as e:
-        db.rollback()
+        await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"خطا در ثبت جزئیات درخواست: {str(e)}"
         )
 
 
-@router.put("/", response_model=ApplicationDetailsResponse)
-def update_application_details(
+@router.put("/{application_details}/", response_model=ApplicationDetailsResponse)
+async def update_application_details(
+    application_details :int , 
     details_data: ApplicationDetailsUpdate,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """به‌روزرسانی جزئیات درخواست"""
-    details = ApplicationDetailsService.get_by_user(db, current_user.id)
+    details = await  ApplicationDetailsService.get_by_id(
+        db,
+        application_details,
+        user_id = current_user.id
+        )
     
     if not details:
         raise HTTPException(
@@ -87,7 +82,6 @@ def update_application_details(
         )
     
     try:
-        # اعتبارسنجی تاریخ آمادگی اگر آپدیت شده
         if 'available_from_date' in details_data.dict(exclude_unset=True):
             if details_data.available_from_date and details_data.available_from_date < date.today():
                 raise HTTPException(
@@ -95,11 +89,13 @@ def update_application_details(
                     detail="تاریخ آمادگی نمی‌تواند از امروز عقب‌تر باشد"
                 )
         
-        updated_details = ApplicationDetailsService.update(db, details, details_data)
+        updated_details = await  ApplicationDetailsService.update(
+            db,
+            details,
+            details_data
+            )
 
-        
-        db.commit()
-        db.refresh(updated_details)
+
         
         return updated_details
         
@@ -113,10 +109,60 @@ def update_application_details(
         )
 
 
+
+@router.patch("/{application_details}/", response_model=ApplicationDetailsResponse)
+async def patch_application_details(
+    application_details: int,
+    details_data: ApplicationDetailsUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+
+    # دریافت جزئیات کاربر
+    details = await ApplicationDetailsService.get_by_id(
+        db,
+        application_details,
+        user_id = current_user.id, 
+
+        )
+    
+    if not details or details.id != application_details:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="شما هنوز جزئیات درخواست را ثبت نکرده‌اید"
+        )
+
+    # اعتبارسنجی تاریخ آمادگی
+    if 'available_from_date' in details_data.dict(exclude_unset=True):
+        if details_data.available_from_date and details_data.available_from_date < date.today():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="تاریخ آمادگی نمی‌تواند از امروز عقب‌تر باشد"
+            )
+    
+    # به‌روزرسانی
+    try:
+        updated_details = await ApplicationDetailsService.update(
+            db,
+            details,
+            details_data
+        )
+        await db.commit()
+        await db.refresh(updated_details)
+        return updated_details
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"خطا در به‌روزرسانی: {str(e)}"
+        )
 @router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 def delete_application_details(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """حذف جزئیات درخواست"""
     details = ApplicationDetailsService.get_by_user(db, current_user.id)
@@ -142,13 +188,15 @@ def delete_application_details(
         )
 
 
-@router.get("/summary/", response_model=DetailsSummaryResponse)
-def get_details_summary(
+@router.get("/summary/", response_model=List[DetailsSummaryResponse])
+async def get_details_summary(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
-    """خلاصه آماری جزئیات درخواست"""
-    details = ApplicationDetailsService.get_by_user(db, current_user.id)
+    details = await ApplicationDetailsService.get_by_user(
+        db,
+        current_user.id
+        )
     
     if not details:
         raise HTTPException(
@@ -156,14 +204,14 @@ def get_details_summary(
             detail="جزئیات درخواست ثبت نشده است"
         )
     
-    summary = ApplicationDetailsSelector.get_summary(db, details)
+    summary = await ApplicationDetailsSelector.get_summery(details)
     return summary
 
 
 # ========== ADMIN ENDPOINTS ==========
 @router.get("/admin/all/")
 def get_all_application_details(
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """دریافت همه جزئیات درخواست (فقط ادمین)"""
@@ -179,7 +227,7 @@ def get_all_application_details(
 
 @router.get("/statistics/")
 def get_application_details_statistics(
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """آمار کلی جزئیات درخواست (فقط ادمین)"""

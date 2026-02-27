@@ -25,7 +25,7 @@ class ApplicationDetails(Base):
     __tablename__ = "application_details"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     
     connection_type = Column(Enum(ConnectionTypeEnum), nullable=False)
     

@@ -1,7 +1,9 @@
-# services.py for application_details
-from sqlalchemy.orm import Session
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from typing import Optional
-import datetime
+from datetime import datetime
+
 from .models import ApplicationDetails
 from .schemas import (
     ApplicationDetailsCreate,
@@ -10,17 +12,40 @@ from .schemas import (
 
 
 class ApplicationDetailsService:
+
     @staticmethod
-    def get_by_user(db: Session, user_id: int) -> Optional[ApplicationDetails]:
-        """دریافت جزئیات درخواست بر اساس user_id"""
-        return db.query(ApplicationDetails).filter(
-            ApplicationDetails.user_id == user_id
-        ).first()
-    
+    async def get_by_user(db: AsyncSession, user_id: int) -> Optional[ApplicationDetails]:
+       
+        result = await db.execute(
+            select(ApplicationDetails).where(ApplicationDetails.user_id == user_id)
+        )
+        print('reusalt is ', result)
+        return result.scalars().all()
+
     @staticmethod
-    def create(
-        db: Session, 
-        user_id: int, 
+    async def get_by_id(db: AsyncSession, app_id: int , *args,**kwargs) -> Optional[ApplicationDetails]:
+        if 'user_id' in kwargs : 
+            user_id = kwargs.get('user_id')
+            assert user_id , "User Not Defiend"
+
+            result = await db.execute(
+                select(ApplicationDetails).where(
+                    ApplicationDetails.id == app_id,
+                    ApplicationDetails.user_id == user_id
+                    )
+                )
+                    
+        else :
+        
+            result = await db.execute(
+                select(ApplicationDetails).where(ApplicationDetails.id == app_id)
+            )
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def create(
+        db: AsyncSession,
+        user_id: int,
         data: ApplicationDetailsCreate
     ) -> ApplicationDetails:
         """ایجاد جزئیات درخواست جدید"""
@@ -52,37 +77,44 @@ class ApplicationDetailsService:
             willing_to_relocate=data.willing_to_relocate,
             other_comments=data.other_comments
         )
-        db.add(new_details)
-        db.flush()
+
+        db.add(new_details)                
+        await db.flush()                    
+        await db.commit()                   
+        await db.refresh(new_details)     
         return new_details
-    
+
     @staticmethod
-    def update(
-        db: Session,
+    async def update(
+        db: AsyncSession,
         details: ApplicationDetails,
         data: ApplicationDetailsUpdate
     ) -> ApplicationDetails:
         """به‌روزرسانی جزئیات درخواست"""
         update_data = data.dict(exclude_unset=True)
-        
+
         for field, value in update_data.items():
             if value is not None:
                 setattr(details, field, value)
-        
+
         details.updated_at = datetime.utcnow()
-        db.add(details)
-        db.flush()
+                
+        db.add(details)             
+        await db.flush()               
+        await db.commit()            
+        await db.refresh(details)
         return details
-    
+
     @staticmethod
-    def delete(db: Session, details: ApplicationDetails) -> None:
+    async def delete(db: AsyncSession, details: ApplicationDetails) -> None:
         """حذف جزئیات درخواست"""
-        db.delete(details)
-        db.flush()
-    
+        await db.delete(details)
+        await db.flush()
+
     @staticmethod
-    def exists(db: Session, user_id: int) -> bool:
+    async def exists(db: AsyncSession, user_id: int) -> bool:
         """بررسی وجود جزئیات درخواست"""
-        return db.query(ApplicationDetails).filter(
-            ApplicationDetails.user_id == user_id
-        ).first() is not None
+        result = await db.execute(
+            select(ApplicationDetails.id).where(ApplicationDetails.user_id == user_id)
+        )
+        return result.scalar_one_or_none() is not None
