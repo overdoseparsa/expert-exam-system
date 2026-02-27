@@ -5,7 +5,7 @@ from typing import List
 from datetime import datetime
 
 from database import get_db
-from auth.depends import get_current_user
+from auth.depends import get_current_user_obj as get_current_user
 from auth.models import User
 from .schemas import (
     SkillCreate, SkillUpdate, SkillResponse,
@@ -14,7 +14,7 @@ from .schemas import (
 from .services import SkillService
 from .selectors import SkillSelector
 
-router = APIRouter(prefix="/skills/", tags=["Skills"])
+router = APIRouter(prefix="/skills", tags=["Skills"])
 
 
 # ========== SKILLS ==========
@@ -37,15 +37,15 @@ async def create_skill(
     """اضافه کردن مهارت جدید"""
     try:
         # بررسی عدم تکراری بودن مهارت
-        is_duplicate = await SkillSelector.check_duplicate(
-            db, current_user.id, skill_data.skill_name
-        )
+        # is_duplicate = await SkillSelector.check_duplicate(
+        #     db, current_user.id, skill_data.skill_name
+        # )
         
-        if is_duplicate:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="این مهارت قبلاً ثبت شده است"
-            )
+        # if is_duplicate:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         detail="این مهارت قبلاً ثبت شده است"
+        #     )
         
         new_skill = await SkillService.create(db, current_user.id, skill_data)
         
@@ -168,7 +168,7 @@ async def get_skills_by_level(
     return skills
 
 
-@router.post("/bulk", response_model=List[SkillResponse], status_code=status.HTTP_201_CREATED)
+@router.post("/bulk/", response_model=List[SkillResponse], status_code=status.HTTP_201_CREATED)
 async def create_skills_bulk(
     skills_data: SkillBulkCreate,
     current_user: User = Depends(get_current_user),
@@ -178,13 +178,7 @@ async def create_skills_bulk(
     
     try:
         for skill_data in skills_data.skills:
-            # بررسی تکراری بودن مهارت
-            is_duplicate = await SkillSelector.check_duplicate(
-                db, current_user.id, skill_data.skill_name
-            )
-            
-            if is_duplicate:
-                continue  # از ثبت تکراری عبور می‌کنیم
+
             
             new_skill = await SkillService.create(db, current_user.id, skill_data)
             added_skills.append(new_skill)

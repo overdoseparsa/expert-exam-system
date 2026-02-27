@@ -18,26 +18,26 @@ class TrainingCourseBase(BaseModel):
     skills_learned: Optional[str] = None
     instructor: Optional[str] = None
     
-    @validator('end_date')
-    def validate_end_date(cls, v, values):
-        if v and 'start_date' in values and v < values['start_date']:
-            raise ValueError('تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد')
-        return v
+    # @validator('end_date')
+    # def validate_end_date(cls, v, values):
+    #     if v and 'start_date' in values and v < values['start_date']:
+    #         raise ValueError('تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد')
+    #     return v
     
-    @validator('certificate_date')
-    def validate_certificate_date(cls, v, values):
-        if v and 'end_date' in values and values['end_date'] and v < values['end_date']:
-            raise ValueError('تاریخ گواهینامه نمی‌تواند قبل از تاریخ پایان دوره باشد')
-        return v
+    # @validator('certificate_date')
+    # def validate_certificate_date(cls, v, values):
+    #     if v and 'end_date' in values and values['end_date'] and v < values['end_date']:
+    #         raise ValueError('تاریخ گواهینامه نمی‌تواند قبل از تاریخ پایان دوره باشد')
+    #     return v
     
-    @validator('certificate_id')
-    def validate_certificate(cls, v, values):
-        if 'has_certificate' in values and values['has_certificate']:
-            if not v:
-                raise ValueError('برای دوره‌ای که گواهینامه دارد، شماره گواهینامه الزامی است')
-            if 'certificate_date' not in values or not values['certificate_date']:
-                raise ValueError('برای دوره‌ای که گواهینامه دارد، تاریخ گواهینامه الزامی است')
-        return v
+    # @validator('certificate_id')
+    # def validate_certificate(cls, v, values):
+    #     if 'has_certificate' in values and values['has_certificate']:
+    #         if not v:
+    #             raise ValueError('برای دوره‌ای که گواهینامه دارد، شماره گواهینامه الزامی است')
+    #         if 'certificate_date' not in values or not values['certificate_date']:
+    #             raise ValueError('برای دوره‌ای که گواهینامه دارد، تاریخ گواهینامه الزامی است')
+    #     return v
 
 
 class TrainingCourseCreate(TrainingCourseBase):

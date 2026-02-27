@@ -5,7 +5,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from .models import Skill
-from schemas import SkillCreate, SkillUpdate, SkillBulkCreate
+from .schemas import SkillCreate, SkillUpdate, SkillBulkCreate
 
 
 class SkillService:

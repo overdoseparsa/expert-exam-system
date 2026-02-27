@@ -7,8 +7,8 @@ from .job_applications import router as job_applications_router
 from .jobs_information import router as jobs_information_router
 from .language_skills import router as language_skills_router
 from .military_service import router as military_service_router
-
-
+from .skills import router as skills_router
+from .training_courses import router as training_courses_router
 routers = [
     applicant_router,
     application_details_router,
@@ -19,4 +19,7 @@ routers = [
     jobs_information_router,
     language_skills_router,
     military_service_router,
+    training_courses_router,
+    skills_router
+
 ]

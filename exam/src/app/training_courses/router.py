@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from database import get_db
-from auth.depends import get_current_user
+from auth.depends import get_current_user_obj as  get_current_user
 from auth.models import User
 from .schemas import (
     TrainingCourseCreate, TrainingCourseUpdate, TrainingCourseResponse,
