@@ -1,56 +1,52 @@
-# services.py for contact_information
-from sqlalchemy.orm import Session
-from .models import ContactInfo , Address
-from .selectors import get_contact_by_user_id , get_address_by_id
+from sqlalchemy.ext.asyncio import AsyncSession
+from .models import ContactInfo, Address
+from .selectors import get_contact_by_user_id, get_address_by_id
 
 
-def create_contact(
-    db: Session,
+async def create_contact(
+    db: AsyncSession,
     user_id: int,
     phone: str,
     emergency_phone: str | None = None,
     email: str | None = None,
 ) -> ContactInfo:
-
-    existing = get_contact_by_user_id(db, user_id)
-    if existing:
-        raise ValueError("Contact info already exists for this user")
-
     contact = ContactInfo(
         user_id=user_id,
         phone=phone,
         emergency_phone=emergency_phone,
         email=email,
     )
-
     db.add(contact)
-    db.commit()
-    db.refresh(contact)
+    await db.commit()
+    await db.refresh(contact)
     return contact
 
 
-def update_contact(
-    db: Session,
+async def update_contact(
+    db: AsyncSession,
     user_id: int,
+    content_id :int , 
     **kwargs,
 ) -> ContactInfo:
-
-    contact = get_contact_by_user_id(db, user_id)
+    contact = await get_contact_by_user_id(
+        db,
+        user_id,
+        content_id,
+        
+        )
     if not contact:
         raise ValueError("Contact info not found")
 
     for key, value in kwargs.items():
         setattr(contact, key, value)
 
-    db.commit()
-    db.refresh(contact)
+    await db.commit()
+    await db.refresh(contact)
     return contact
 
 
-
-
-def create_address(
-    db: Session,
+async def create_address(
+    db: AsyncSession,
     user_id: int,
     province: str,
     city: str,
@@ -59,7 +55,6 @@ def create_address(
     postal_code: str | None = None,
     ownership_duration: int | None = None,
 ) -> Address:
-
     new_address = Address(
         user_id=user_id,
         province=province,
@@ -69,17 +64,16 @@ def create_address(
         housing_status=housing_status,
         ownership_duration=ownership_duration,
     )
-
     db.add(new_address)
-    db.commit()
-    db.refresh(new_address)
+    await db.commit()
+    await db.refresh(new_address)
     return new_address
 
 
-def delete_address(db: Session, address_id: int) -> None:
-    address = get_address_by_id(db, address_id)
+async def delete_address(db: AsyncSession, address_id: int) -> None:
+    address = await get_address_by_id(db, address_id)
     if not address:
         raise ValueError("Address not found")
 
-    db.delete(address)
-    db.commit()
+    await db.delete(address)
+    await db.commit()
