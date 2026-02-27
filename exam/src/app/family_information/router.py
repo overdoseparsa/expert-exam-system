@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from database import get_db
-from auth.depends  import get_current_user
+from auth.depends  import get_current_user_obj as get_current_user
 from auth.models import User
 from .schemas import (
     SpouseCreate, SpouseUpdate, SpouseResponse,
@@ -118,7 +118,7 @@ async def get_children(
     db: AsyncSession = Depends(get_db)
 ):
     """دریافت لیست فرزندان"""
-    children = await ChildService.get_by_applicant(db, current_user.id)
+    children = await ChildSelector.get_by_user_id(db, current_user.id)
     return children
 
 
@@ -139,10 +139,7 @@ async def create_child(
         # else:
         #     applicant.updated_at = datetime.utcnow()
         #     db.add(applicant)
-        
-        # await db.commit()
-        await db.refresh(new_child)
-        
+
         return new_child
         
     except Exception as e:
@@ -252,7 +249,7 @@ async def create_sibling(
         new_sibling = await SiblingService.create(db, current_user.id, sibling_data)
         
 
-        await db.refresh(new_sibling)
+       
         
         return new_sibling
         

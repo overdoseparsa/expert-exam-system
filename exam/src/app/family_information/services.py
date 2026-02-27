@@ -16,7 +16,6 @@ from .schemas import (
 class SpouseService:
     @staticmethod
     async def get_by_user(db: AsyncSession, user_id) -> Optional[Spouse]:
-
         query = select(Spouse).where(Spouse.user_id == user_id)
         result = await db.execute(query)
         return result.scalar_one_or_none()
@@ -24,6 +23,10 @@ class SpouseService:
     @staticmethod
     async def create(db: AsyncSession, user_id , data: SpouseCreate) -> Spouse:
         """ایجاد همسر جدید"""
+        
+        if await SpouseService.exists(db, user_id):
+            raise Exception("شما قبلا همسر ثبت کردید")
+        
         spouse = Spouse(
             user_id=user_id,
             full_name=data.full_name,
@@ -98,6 +101,9 @@ class ChildService:
             gender=data.gender
         )
         db.add(child)
+                
+        await db.commit()
+        await db.refresh(child)
         await db.flush()
         return child
     
@@ -161,6 +167,8 @@ class SiblingService:
             job=data.job
         )
         db.add(sibling)
+        await db.commit() 
+        await db.refresh(sibling)
         await db.flush()
         return sibling
     
